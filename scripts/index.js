@@ -5,12 +5,12 @@ const placesList = sectionPlaces.querySelector('.places__list');
 const cardTemplate = document.querySelector('#card-template').content;
 
 //Функция создания карточки
-function createCard(name, link, ClickOnTrashIcon) {
+function createCard(name, link, clickOnTrashIcon) {
   const cardElement = cardTemplate.querySelector('.places__item').cloneNode(true);
 
   const deleteBtn = cardElement.querySelector('.card__delete-button');
   deleteBtn.addEventListener('click', function() {
-    ClickOnTrashIcon(cardElement);
+    clickOnTrashIcon(cardElement);
   });
 
   const cardImage = cardElement.querySelector('.card__image');
