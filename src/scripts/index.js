@@ -129,18 +129,16 @@ function openImage(name, link) {
 
 function addEventListenerForPopup(popup) {
   const popupCloseButton = popup.querySelector(".popup__close");
-  const currentForm = popup.closest('.popup__form');
+  const currentForm = popup.querySelector('.popup__form');
 
   popupCloseButton.addEventListener("click", (event) => {
-    closeModal(event, popup);
-    if (currentForm !== null) {
+    if (closeModal(event, popup) && currentForm !== null) {
       clearValidation(currentForm, validationSettings);
     }
   });
 
   popup.addEventListener("click", (event) => {
-    closeModal(event, popup);
-    if (currentForm !== null) {
+    if (closeModal(event, popup) && currentForm !== null) {
       clearValidation(currentForm, validationSettings);
     }
   });

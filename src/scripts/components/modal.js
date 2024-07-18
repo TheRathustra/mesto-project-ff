@@ -10,7 +10,7 @@ function closeModal(event, popup, close = false) {
   }
 
   if (!popup) {
-    return;
+    return false;
   }
 
   const popupCloseButton = popup.querySelector(".popup__close");
@@ -21,9 +21,16 @@ function closeModal(event, popup, close = false) {
     close
   ) {
     closePopup(popup);
+    popup.querySelectorAll('input').forEach((input) => {
+      input.value = "";
+    });
+  
+    document.removeEventListener("keydown", closeModal);
+
+    return true;
   }
 
-  document.removeEventListener("keydown", closeModal);
+  return false;
 }
 
 function openPopup(popup) {
