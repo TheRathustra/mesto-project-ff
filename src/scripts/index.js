@@ -53,14 +53,8 @@ addButton.addEventListener("click", () => {
 });
 
 editButton.addEventListener("click", () => {
-  if (nameInput.value === "") {
-    nameInput.value = title.textContent;
-  }
-
-  if (jobInput.value === "") {
-    jobInput.value = description.textContent;
-  }
-
+  nameInput.value = title.textContent;
+  jobInput.value = description.textContent;
   openModal(popupTypeEdit);
 });
 
@@ -135,13 +129,20 @@ function openImage(name, link) {
 
 function addEventListenerForPopup(popup) {
   const popupCloseButton = popup.querySelector(".popup__close");
+  const currentForm = popup.closest('.popup__form');
 
   popupCloseButton.addEventListener("click", (event) => {
     closeModal(event, popup);
+    if (currentForm !== null) {
+      clearValidation(currentForm, validationSettings);
+    }
   });
 
   popup.addEventListener("click", (event) => {
     closeModal(event, popup);
+    if (currentForm !== null) {
+      clearValidation(currentForm, validationSettings);
+    }
   });
 }
 
