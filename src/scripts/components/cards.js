@@ -80,7 +80,7 @@ function adjustLikeAction(
 function deleteCard(event, cardData, deleteCardAPI) {
   deleteCardAPI(cardData._id)
     .then(() => {
-      let card = event.target.closest(".card");
+      const card = event.target.closest(".card");
       card.parentElement.removeChild(card);
     })
     .catch((err) => console.log(err));
