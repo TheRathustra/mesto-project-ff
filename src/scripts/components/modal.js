@@ -21,10 +21,6 @@ function closeModal(event, popup, close = false) {
     close
   ) {
     closePopup(popup);
-    popup.querySelectorAll('input').forEach((input) => {
-      input.value = "";
-    });
-  
     document.removeEventListener("keydown", closeModal);
 
     return true;

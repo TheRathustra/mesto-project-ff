@@ -5,7 +5,13 @@ function createCard(cardData, clickFunctions, cardAPI, profileId) {
     .querySelector(".places__item")
     .cloneNode(true);
 
-  adjustDeleteAction(cardElement, cardData, clickFunctions.trash, cardAPI.deleteCard);
+  adjustDeleteAction(
+    cardElement,
+    cardData,
+    clickFunctions.trash,
+    cardAPI.deleteCard,
+    profileId
+  );
   adjustCardImage(cardElement, cardData, clickFunctions.card);
   adjustLikeAction(
     cardElement,
@@ -18,9 +24,16 @@ function createCard(cardData, clickFunctions, cardAPI, profileId) {
   return cardElement;
 }
 
-function adjustDeleteAction(cardElement, cardData, trashCallback, deleteCardAPI) {
+function adjustDeleteAction(
+  cardElement,
+  cardData,
+  trashCallback,
+  deleteCardAPI,
+  profileId
+) {
   const deleteBtn = cardElement.querySelector(".card__delete-button");
-  if (trashCallback !== null) {
+
+  if (profileId === cardData.owner._id) {
     deleteBtn.addEventListener("click", (event) => {
       trashCallback(event, cardData, deleteCardAPI);
     });
@@ -65,20 +78,25 @@ function adjustLikeAction(
 }
 
 function deleteCard(event, cardData, deleteCardAPI) {
-  deleteCardAPI(cardData._id);
-  let card = event.target.closest(".card");
-  card.parentElement.removeChild(card);
+  deleteCardAPI(cardData._id)
+    .then(() => {
+      let card = event.target.closest(".card");
+      card.parentElement.removeChild(card);
+    })
+    .catch((err) => console.log(err));
 }
 
 function сlickOnLike(event, card, saveLikeCard) {
-  event.target.classList.toggle("card__like-button_is-active");
-  let likeElement = event.target.closest(".card__like");
-  const likeNumber = likeElement.querySelector(".card__like-number");
   saveLikeCard(
     card._id,
-    event.target.classList.contains("card__like-button_is-active")
+    !event.target.classList.contains("card__like-button_is-active")
   )
-    .then((result) => (likeNumber.textContent = result.likes.length))
+    .then((result) => {
+      event.target.classList.toggle("card__like-button_is-active");
+      const likeElement = event.target.closest(".card__like");
+      const likeNumber = likeElement.querySelector(".card__like-number");
+      likeNumber.textContent = result.likes.length;
+    })
     .catch((err) => console.log(err));
 }
 

@@ -49,24 +49,27 @@ const clickFunctions = {
 let profileId = undefined;
 
 addButton.addEventListener("click", () => {
+  clearValidation(addForm, validationSettings);
   openModal(popupTypeNew);
 });
 
 editButton.addEventListener("click", () => {
   nameInput.value = title.textContent;
   jobInput.value = description.textContent;
+  clearValidation(editForm, validationSettings);
   openModal(popupTypeEdit);
 });
 
 avatarButton.addEventListener("click", () => {
+  clearValidation(avatarForm, validationSettings);
   openModal(popupTypeAvatar);
 });
 
 function handleNewCardFormSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true, addForm);
+  const btn = addForm.querySelector(".popup__button");
 
-  clickFunctions.trash = deleteCard;
+  renderLoading(true, btn, "Сохраняю...");
 
   crudAPI
     .addCard(cardNameInput.value, urlInput.value)
@@ -74,46 +77,48 @@ function handleNewCardFormSubmit(evt) {
       const newCard = createCard(card, clickFunctions, crudAPI, profileId);
       closeModal(evt, popupTypeNew, true);
       placesList.prepend(newCard);
+
+      addForm.reset();
+      clearValidation(addForm, validationSettings);
     })
     .catch(handleError)
-    .finally(renderLoading(false, addForm));
-
-  addForm.reset();
-  clearValidation(addForm, validationSettings);
+    .finally(renderLoading(false, btn, "Сохранить"));
 }
 
 function handleEditProfileFormSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true, editForm);
+  const btn = editForm.querySelector(".popup__button");
+
+  renderLoading(true, btn, "Сохраняю...");
 
   crudAPI
     .patchProfile(nameInput.value, jobInput.value)
     .then((profileData) => {
       updateProfile(profileData);
+      closeModal(evt, popupTypeEdit, true);
+      clearValidation(editForm, validationSettings);
     })
     .catch(handleError)
-    .finally(renderLoading(false, editForm));
-
-  closeModal(evt, popupTypeEdit, true);
-  clearValidation(editForm, validationSettings);
+    .finally(renderLoading(false, btn, "Сохранить"));
 }
 
 function handleEditAvatarFormSubmit(evt) {
   evt.preventDefault();
-  renderLoading(true, avatarForm);
+  const btn = avatarForm.querySelector(".popup__button");
+
+  renderLoading(true, btn, "Сохраняю...");
 
   crudAPI
     .patchAvatar(avatarInput.value)
     .then((profileData) => {
       profileImage.style.backgroundImage = `url('${profileData.avatar}')`;
+      closeModal(evt, popupTypeAvatar, true);
+      clearValidation(avatarForm, validationSettings);
+
+      avatarForm.reset();
     })
     .catch(handleError)
-    .finally(renderLoading(false, avatarForm));
-
-  closeModal(evt, popupTypeAvatar, true);
-  clearValidation(avatarForm, validationSettings);
-
-  avatarForm.reset();
+    .finally(renderLoading(false, btn, "Сохранить"));
 }
 
 addForm.addEventListener("submit", handleNewCardFormSubmit);
@@ -129,18 +134,13 @@ function openImage(name, link) {
 
 function addEventListenerForPopup(popup) {
   const popupCloseButton = popup.querySelector(".popup__close");
-  const currentForm = popup.querySelector('.popup__form');
 
   popupCloseButton.addEventListener("click", (event) => {
-    if (closeModal(event, popup) && currentForm !== null) {
-      clearValidation(currentForm, validationSettings);
-    }
+    closeModal(event, popup);
   });
 
   popup.addEventListener("click", (event) => {
-    if (closeModal(event, popup) && currentForm !== null) {
-      clearValidation(currentForm, validationSettings);
-    }
+    closeModal(event, popup);
   });
 }
 
@@ -162,16 +162,14 @@ Promise.all([crudAPI.getProfile(), crudAPI.getCards()])
     updateProfile(profile);
 
     cards.forEach((card) => {
-      clickFunctions.trash = profileId === card._id ? deleteCard : null;
       const newCard = createCard(card, clickFunctions, crudAPI, profileId);
       placesList.append(newCard);
     });
   })
   .catch(handleError);
 
-function renderLoading(isLoading, currentForm) {
-  const btn = currentForm.querySelector(".popup__button");
-  btn.textContent = isLoading ? "Сохраняю..." : "Сохранить";
+function renderLoading(isLoading, btn, btnText) {
+  btn.textContent = btnText;
   if (isLoading) {
     spinner.classList.add("spinner_visible");
   } else {
